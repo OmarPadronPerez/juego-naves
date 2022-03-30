@@ -37,7 +37,6 @@ let anchoPan=pantalla.canvas.width;
 let altoPan=pantalla.canvas.height;
 
  
-
 /**funcion par acargar imagenes  */
 function cargarImagen(url){
     let ima=new Image();
@@ -61,8 +60,8 @@ document.addEventListener('keydown', function(e){
             let x=naveP.posicionX+(naveP.ancho/2);
             let y=naveP.posicionY-3;
             let nueva=new Bala(1,x,y,"imagenes/bala verde.png");
-            console.log(nueva+" "+arrayBalas.push(nueva));
-            //arrayBalas.push(nueva);
+            //console.log(nueva+" "+arrayBalas.push(nueva));
+            arrayBalas.push(nueva);
 
         break;
     }
@@ -72,26 +71,53 @@ document.addEventListener('keydown', function(e){
 
 /**funcion para mover balas */
 function moverBalas(){
-    arrayBalas.forEach((actual) => {
-        if(actual.tipo==0){// bala de jugador           0 principal  1 enemiga
+    /*arrayBalas.forEach((actual,index) => {
+        if(actual.tipo==0){// bala de jugador                  0 principal  1 enemiga
             actual.posicionY=actual.posicionY+5;
         }else{ //bala enemiga
             actual.posicionY=actual.posicionY-5;
         }
 
-        if(actual.posicionY<(-actual.alto-3)||              //si la bala tiene posicion 
-        actual.posicionY>altoPan+actual.alto+3){            //(-actual.alto-3) es que                                                            
-            arrayBalas.splice(actual);                      // salio por arriba o si es mayor que  
-            console.log("bala fuera: "+arrayBalas.length);  //el canvas es que salio por abajo y seran eliminadas
-            
+        if(actual.posicionY<(-actual.alto-3)/*||                  //salio por arriba del canvas
+            actual.posicionY>altoPan+actual.alto+3){            //salio por abajo del canvas
+                console.log("bala fuera: "+arrayBalas.length);
+                arrayBalas=borrarElementoArray(arrayBalas,index);
+
         }
-    });
+        
+    });*/
+    
+   
+    let i=0
+    for(i=0;i<arrayBalas.length;i++){
+        console.log("bala mover: "+arrayBalas);
+        if(arrayBalas[i].tipo==0){// bala de jugador                  0 principal  1 enemigo
+            arrayBalas[i].posicionY=arrayBalas[i].posicionY+5;
+        }else{ //bala enemiga
+            arrayBalas[i].posicionY=arrayBalas[i].posicionY-5;
+        }
+
+        if(arrayBalas[i].posicionY<(-arrayBalas[i].alto-3)||              //salio por arriba del canvas
+        arrayBalas[i].posicionY>altoPan+arrayBalas[i].alto+3){            //salio por abajo del canvas
+
+            console.log("bala fuera: "+arrayBalas.length);
+            arrayBalas=borrarElementoArray(arrayBalas,i);
+            i--;
+        }
+    }
+}
+
+/**borra elementos del arreglo*/
+function borrarElementoArray(array,borrar){
+    let nuevo =array.splice(borrar,1);
+    console.log("borado: "+nuevo);
+    return nuevo;
 }
 
 
 /**funcion principal*/
-    let arrayBalas=[];
-    let arrayEnemigos=[];
+    const arrayBalas=[];
+    const arrayEnemigos=[];
     let contTiem=0;
 
     /**inicar naves*/
@@ -106,6 +132,7 @@ function dibujarPantalla(){
     arrayBalas.forEach((actual) => {// array para dibujar balas
         pantalla.drawImage(actual.imagen, actual.posicionX, actual.posicionY, actual.ancho, actual.alto);
     });
+
     pantalla.drawImage(naveP.imagen, naveP.posicionX, naveP.posicionY, naveP.ancho, naveP.alto);//dibujar jugador
 }
 
@@ -114,4 +141,5 @@ setInterval(() => {
     //console.log("balas "+arrayBalas);
     moverBalas();
     dibujarPantalla();
+    contTiem++;
 }, 100);
