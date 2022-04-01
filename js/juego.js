@@ -10,7 +10,7 @@ function Nave(x){//nave principal
 }
 
 function Bala(tipo,inicialX,inicialY,url){
-    this.tipo=tipo // 0 principal  1 enemiga
+    this.tipo=tipo; // 0 principal  1 enemiga
     this.ancho=3;
     this.alto=10;
     this.imagen=new Image();
@@ -56,37 +56,64 @@ document.addEventListener('keydown', function(e){
             console.log("DISPARA");
             let x=naveP.posicionX+(naveP.ancho/2);
             let y=naveP.posicionY-3;
-            let nueva=new Bala(1,x,y,"imagenes/bala verde.png");
+            let nueva=new Bala(0,x,y,"imagenes/bala verde.png");
             //console.log(nueva+" "+arrayBalas.push(nueva));
             arrayBalas.push(nueva);
 
         break;
     }
-    //console.log(naveP.posicionX);
-    //dibujarPantalla();
 });  
 
 
 /**funcion para mover balas */
 function moverBalas(){
     let i=0
+    var nBalas=arrayBalas;
+    var nEnemi=arrayEnemigos;
     for(i=0;i<arrayBalas.length;i++){
+        /**movimieno de la bala */
         //console.log("bala mover: "+arrayBalas);
         if(arrayBalas[i].tipo==0){// bala de jugador                  0 principal  1 enemigo
-            arrayBalas[i].posicionY+=5;
-        }else{ //bala enemiga
             arrayBalas[i].posicionY-=5;
+        }else{ //bala enemiga
+            arrayBalas[i].posicionY+=5;
         }
 
+        /**bala fuera del mapa */
         if(arrayBalas[i].posicionY<(-arrayBalas[i].alto-3)||    //salio por arriba del canvas
         arrayBalas[i].posicionY>altoPan+arrayBalas[i].alto+3){  //salio por abajo del canvas
-
             //console.log("bala fuera: "+arrayBalas.length);
-            arrayBalas=borrarElementoArray(arrayBalas,i);
+            arrayBalas=borrarElementoArray(arrayBalas,i);       //borra bala porque salio del mapa
             i--;
+            if(arrayBalas.length==0){
+                break;
+            }
         }
-        /**coliciones*/
 
+        /**coliciones*/
+        console.log("****nuevo****");
+        for(let j=0;arrayEnemigos.length>j; j++){
+            console.log("checando colision "+j);
+            if((arrayEnemigos[j].posicionY+arrayEnemigos[j].alto-5>=arrayBalas[i].posicionY &&//bala entra a la altura de enemigo
+                arrayEnemigos[j].posicionY<=arrayBalas[i].posicionY) &&    //bala sale de la altura de enemigo
+               (arrayEnemigos[j].posicionX<=arrayBalas[i].posicionX &&  //bala entra en la posicion minima del enemigo
+                arrayEnemigos[j].posicionX+arrayEnemigos[j].ancho>=arrayBalas[i].posicionX)&& //bala queda en la posicion maxima del enemigo
+                arrayBalas[i].tipo==0//colicion bala de jugador con enemigo
+                ){
+                    console.log("borrando enemigo****"+j);
+                    console.log("cantidad antees balas***"+arrayBalas.length);
+                    arrayEnemigos=borrarElementoArray(arrayEnemigos,j)//borra enemigo
+                    j--;
+                    arrayBalas=borrarElementoArray(arrayBalas,i);     //borra bala
+                    i--;
+                    console.log("cantidad despues balas****************"+arrayBalas.length);
+                    if(arrayBalas.length==0){
+                        break;
+                    }
+                    
+            }
+        }
+        
     }
 }
 
@@ -97,9 +124,11 @@ function iniciarEnemigos(){
     let alto2=30
     let distancia= 26;
     let alto=0;
+    /*let naveP=new Ctie(anchoPan/2, 30);//(x,y) crear naves enemigas
+    arrayEnemigos.push(naveP);*/
+
     //agregar un for y ver cuantos caben y separacion 
     while(ancho+distancia+10<anchoPan){
-
         for(let i=0;i<2;i++){
             if(alto==alto1){
                 alto=alto2;
@@ -110,14 +139,14 @@ function iniciarEnemigos(){
             arrayEnemigos.push(naveP);
             ancho+=distancia;
         }
-        
-    }    
+    }   
 }
 
 
 /**borra elementos del arreglo*/
 function borrarElementoArray(array,borrar){
-    const nuevo =Array.from(array.splice(borrar,1));
+    var nuevo =array;
+    nuevo.splice(borrar,1);
     //console.log("borado: "+nuevo);
     return nuevo;
 }
@@ -138,8 +167,8 @@ function dibujarPantalla(){
 }
 
 /**funcion principal*/
-    const arrayBalas=[];
-    const arrayEnemigos=[];
+    var arrayBalas=[];
+    var arrayEnemigos=[];
     let contTiem=0;
 
     /**inicar naves*/
